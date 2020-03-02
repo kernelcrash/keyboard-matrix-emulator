@@ -91,7 +91,7 @@ p1        p12                  PE7
 And the Galaksija key matrix. It's a little unusual as far as
 key matrix's go, as the keys are in somewhat alphabetic order,
 rather than position order. I think this was due to limited size
-of the original Galaksize ROM.
+of the original Galaksija ROM.
 
 ```
 
