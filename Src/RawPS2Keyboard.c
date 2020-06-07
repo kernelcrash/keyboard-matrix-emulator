@@ -188,7 +188,7 @@ void kbd_set_lights(byte val) {
 // simple lines of code.
 void ps2interrupt (void) {
   //int value = digitalRead(ps2Keyboard_DataPin);
-  int value  = ( ( LL_GPIO_ReadInputPort(GPIOC) >> 1) & 0x0001);
+  int value  = ( ( LL_GPIO_ReadInputPort(GPIOC) >> 5) & 0x0001);
 
   // This is the code to send a byte to the keyboard. Actually its 12 bits:
   // a start bit, 8 data bits, 1 parity, 1 stop bit, 1 ack bit (from the kbd)
@@ -220,7 +220,7 @@ void ps2interrupt (void) {
       break;
     case 12: // ack bit - driven by the kbd, so we read its value
       //cmd_ack_value = digitalRead(ps2Keyboard_DataPin);
-      cmd_ack_value  = ( ( LL_GPIO_ReadInputPort(GPIOC) >> 1) & 0x0001);
+      cmd_ack_value  = ( ( LL_GPIO_ReadInputPort(GPIOC) >> 5) & 0x0001);
       cmd_in_progress = FALSE;  // done shifting out
     }
     return; // don't fall through to the receive section of the ISR

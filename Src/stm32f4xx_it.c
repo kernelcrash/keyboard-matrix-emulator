@@ -201,17 +201,84 @@ void SysTick_Handler(void)
 
 void EXTI0_IRQHandler(void)
 {
+	uint32_t col;
+	uint32_t row;
+
+	if(LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_0) != RESET)
+	{
+    		LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_0);
+		row = (GPIOD->IDR & 0x000f);
+		col = rowcache[row];
+		GPIOE->ODR = (uint32_t) col;
+	}
+}
+
+void EXTI1_IRQHandler(void)
+{
+	uint32_t col;
+	uint32_t row;
+
+	if(LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_1) != RESET)
+	{
+    		LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_1);
+		row = (GPIOD->IDR & 0x000f);
+		col = rowcache[row];
+		GPIOE->ODR = (uint32_t) col;
+	}
+}
+
+void EXTI2_IRQHandler(void)
+{
+	uint32_t col;
+	uint32_t row;
+
+	if(LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_2) != RESET)
+	{
+    		LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_2);
+		row = (GPIOD->IDR & 0x000f);
+		col = rowcache[row];
+		GPIOE->ODR = (uint32_t) col;
+	}
+}
+
+void EXTI3_IRQHandler(void)
+{
+	uint32_t col;
+	uint32_t row;
+
+	if(LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_3) != RESET)
+	{
+    		LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_3);
+		row = (GPIOD->IDR & 0x000f);
+		col = rowcache[row];
+		GPIOE->ODR = (uint32_t) col;
+	}
+}
+
+
+void EXTI4_IRQHandler(void)
+{
   /* Manage Flags */
-  if(LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_0) != RESET)
+  if(LL_EXTI_IsActiveFlag_0_31(LL_EXTI_LINE_4) != RESET)
   {
+    	LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_4);
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	__asm volatile ("nop");
+	if (!(LL_GPIO_ReadInputPort(GPIOC) & 0x0010)) {
     /* Call interruption treatment function */
     //LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_1);
-    ps2interrupt();
+    		ps2interrupt();
+	}
 
     /* Clear EXTI line flag */
     /* Note: Clear flag after callback function to minimize user button       */
     /*       switch debounce parasitics.                                      */
-    LL_EXTI_ClearFlag_0_31(LL_EXTI_LINE_0);
   }
 }
 

@@ -66,36 +66,39 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-// 'A' key is intersection of colomn 0 and row 1 (ie 2nd row), so bottom 3 bits 0 and next 3 bits 1  = 0x08
+	// init to all keys up
+	for (int i=0; i<16; i++) {
+		rowcache[i] = 255;
+	}
+	//rowcache[16] = { 255,255,255,255, 255,255,255,255, 255,255,255,255, 255,255,255,255 };
+
+// '1' key is intersection of row 0 and column 1 , so bottom 4 bits 0 and next 3 bits 1  = 0x10
+// '1' key PS2 event is 0x16
+// So for '1' at 0x16 into the table, we put 0x10
+// '2' key is insersection of row 0 and column 2 , so bottom 4 bits 0 and next 3 bits 010 = 0x20
+// '2' key PS2 envent is 0x1e
+// So for '2' at 0x1e into the table, we put 0x20
+// 'A' key is intersection of row 2 and column 6 , so bottom 4 bits 0010 and next 3 bits 110 = 0x62
 // 'A' key PS2 event is 0x1c
-// So for 'A' at 0x1c into the table, we put 0x08
-// 'B' key is insersection of column 0 and row 2 (ie 3rd row), so bottom 3 bits 0 and next 3 bits 010 = 0x10
-// 'B' key PS2 envent is 0x32
-// So for 'B' at 0x32 into the table, we put 0x10
-// 'C' key is intersection of column 0 and row 3 (ie 4th row) , so bottom 3 bits 0 and next 3 bits 011 = 0x18
-// 'C' key PS2 event is 0x21
-// keyarray[] converts a PS2 keycode to a 6 bit rowcol ref in the Galaksija keyboard
-// Galaksija special keys
-//   BRK - maps to F1
-//   RPT - maps to F2
-//   LIST - maps to F3
-//   DEL  -maps to DEL (backspace is not mapped)
-byte keyarray[256] = {255,255,255,255,0x26,0x0e,0x16,255,  // 0x00 - 0x07
-                      255,255,255,255,255,255,255,255,  // 0x08 - 0x0f
-                      255,0x2c,0x2e,255,0x14,0x0a,0x0c,255,  // 0x10 - 0x17
-                      255,255,0x13,0x1a,0x08,0x3a,0x14,255,  // 0x18 - 0x1f
-                      255,0x18,0x03,0x20,0x28,0x24,0x1c,255,  // 0x20 - 0x27
-                      255,0x3b,0x32,0x30,0x22,0x12,0x2c,255,  // 0x28 - 0x2f
-                      255,0x31,0x10,0x01,0x38,0x0b,0x34,255,  // 0x30 - 0x37
-                      255,255,0x29,0x11,0x2a,0x3c,0x05,255,  // 0x38 - 0x3f
-                      255,0x25,0x19,0x09,0x39,0x04,0x0d,255,  // 0x40 - 0x47
-                      255,0x35,0x3d,0x21,0x15,0x02,0x1b,255,  // 0x48 - 0x4f
-                      255,255,0x1f,255,0x2f,0x2d,255,255,  // 0x50 - 0x57
-                      255,0x36,0x06,0x2e,255,0x1d,255,255,  // 0x58 - 0x5f
-                      255,255,255,255,255,255,255,255,  // 0x60 - 0x67
+// So for 'A' at 0x1c into the table, we put 0x62
+//
+// Select is F10 on PS2 keyboard
+volatile byte keyarray[256] = {255,255,255,0x17,0x76,0x56,0x66,0x46,  // 0x00 - 0x07
+                      255,0x67,255,255,0x07,0x37,0x12,255,  // 0x08 - 0x0f
+                      255,0x2c,0x06,255,0x16,0x64,0x10,255,  // 0x10 - 0x17
+                      255,255,0x75,0x05,0x62,0x45,0x20,255,  // 0x18 - 0x1f
+                      255,0x03,0x55,0x13,0x23,0x40,0x30,255,  // 0x20 - 0x27
+                      255,0x08,0x35,0x33,0x15,0x74,0x50,255,  // 0x28 - 0x2f
+                      255,0x34,0x72,0x53,0x43,0x65,0x60,255,  // 0x30 - 0x37
+                      255,255,0x24,0x73,0x25,0x70,0x01,255,  // 0x38 - 0x3f
+                      255,0x22,0x04,0x63,0x44,0x00,0x11,255,  // 0x40 - 0x47
+                      255,0x32,0x42,0x14,0x71,0x54,0x21,255,  // 0x48 - 0x4f
+                      255,255,0x02,255,0x51,0x31,255,255,  // 0x50 - 0x57
+                      0x36,0x06,0x77,0x61,255,0x41,255,255,  // 0x58 - 0x5f
+                      255,255,255,255,255,255,0x57,255,  // 0x60 - 0x67
                       255,255,255,255,255,255,255,255,  // 0x68 - 0x6f
-                      255,255,255,255,255,255,0x0e,255,  // 0x70 - 0x77
-                      255,255,255,255,255,255,255,255,  // 0x78 - 0x7f
+                      255,255,255,255,255,255,0x27,255,  // 0x70 - 0x77
+                      0x47,255,255,255,255,255,255,255,  // 0x78 - 0x7f
 // for E0 codes (basically we OR the EO code with 0x80. eg. Left arrow is E0 6B, so EB is the entry below for left arrow
                       255,255,255,255,255,255,255,255,  // 0x80 - 0x87
                       255,255,255,255,255,255,255,255,  // 0x88 - 0x8f
@@ -110,33 +113,13 @@ byte keyarray[256] = {255,255,255,255,0x26,0x0e,0x16,255,  // 0x00 - 0x07
                       255,255,255,255,255,255,255,255,  // 0xd0 - 0xd7
                       255,255,255,255,255,255,255,255,  // 0xd8 - 0xdf
                       255,255,255,255,255,255,255,255,  // 0xe0 - 0xe7
-                      255,255,255,0x2b,255,255,255,255,  // 0xe8 - 0xef
-                      255,0x1e,0x23,255,0x33,0x1b,255,255,  // 0xf0 - 0xf7
+                      255,255,255,0x48,0x18,255,255,255,  // 0xe8 - 0xef
+                      0x28,0x38,0x68,255,0x78,0x58,255,255,  // 0xf0 - 0xf7
                       255,255,255,255,255,255,255,255 }; // 0xf8 - 0xff
 
 
-  // We need to quickly determine which of 8 bits is low and convert to a number from 0 to 7, so we use a lookup table
-  // Galaksija is 7 rows so we really only need 128 entries, but leaving here as 256 to make it easier to use
-  // for other computers
-  byte columnarray[256] = {
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  //00 - 0f
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  //10 - 1f
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  //20 - 2f
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,6,  //30 - 3f
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  //40 - 4f
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,5,  //50 - 5f
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,4,  //60 - 6f
-    255,255,255,255,255,255,255,3,255,255,255,2,255,1,0,255, //70 - 7f
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  //80 - 8f
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  //90 - 9f
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  //A0 - Af
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  //B0 - Bf
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  //c0 - cf
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  //d0 - df
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,  //e0 - ef
-    255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255 };  //f0 - ff
 
-  byte columncache[8] = { 255,255,255,255, 255,255,255,255 };
+
 
   byte special_key_flag;
   byte last_key;
@@ -183,14 +166,21 @@ byte keyarray[256] = {255,255,255,255,0x26,0x0e,0x16,255,  // 0x00 - 0x07
 
   LL_GPIO_SetOutputPin(GPIOA,LL_GPIO_PIN_1);
 
-  /* Configure NVIC for USER_BUTTON_EXTI_IRQn */
+  NVIC_EnableIRQ(EXTI4_IRQn);
+  NVIC_SetPriority(EXTI4_IRQn,0x03);
+
   NVIC_EnableIRQ(EXTI0_IRQn);
   NVIC_SetPriority(EXTI0_IRQn,0x03);
+  NVIC_EnableIRQ(EXTI1_IRQn);
+  NVIC_SetPriority(EXTI1_IRQn,0x03);
+  NVIC_EnableIRQ(EXTI2_IRQn);
+  NVIC_SetPriority(EXTI2_IRQn,0x03);
+  NVIC_EnableIRQ(EXTI3_IRQn);
+  NVIC_SetPriority(EXTI3_IRQn,0x03);
 
   kbd_begin(PS2_DATA_PIN, PS2_CLOCK_PIN, TRUE);
 
 
-  //LL_mDelay(3000);
   //CDC_Transmit_FS(buffer,sizeof(buffer));
   /* USER CODE END 2 */
  
@@ -204,16 +194,9 @@ byte keyarray[256] = {255,255,255,255,0x26,0x0e,0x16,255,  // 0x00 - 0x07
 
     /* USER CODE BEGIN 3 */
 
-    col = GPIOD->IDR &0x7f;
-    if (col != 0x7f) { 
-      //sprintf((char * restrict) buffer,"col %02x\n",columnarray[col]);
-      //CDC_Transmit_FS(buffer,sizeof(buffer));
-    
-      row = columncache[columnarray[col]];
-      // Normally this will output an 0xFF (ie no key pressed)
-      GPIOE->ODR = row;
-
-    }
+    //row = (GPIOD->IDR & 0x000f);
+    //col = rowcache[row];
+    //GPIOE->ODR = (uint32_t) col;
 
     if(kbd_available()) {
       // Get a PS2 keycode
@@ -223,17 +206,16 @@ byte keyarray[256] = {255,255,255,255,0x26,0x0e,0x16,255,  // 0x00 - 0x07
         special_key_flag=0;
         if (last_key == 0xf0) {
           // UP
-          pressed_col = keyarray[c] & 0x07;
-          pressed_row = (keyarray[c] & 0x38 ) >> 3;
-          columncache[pressed_col] |= (1 << pressed_row);
-          
-
+          pressed_row = keyarray[c] & 0x0f;
+          pressed_col = (keyarray[c] & 0x70) >> 4;
+	  rowcache[pressed_row] |= (1 << pressed_col);
         } else {
-
           // DOWN
-          pressed_col = keyarray[c] & 0x07;
-          pressed_row = (keyarray[c] & 0x38 ) >> 3;
-          columncache[pressed_col] &= ~(1 << pressed_row);
+	  if (keyarray[c] != 0xff) {
+            pressed_row = keyarray[c] & 0x0f;
+            pressed_col = (keyarray[c] & 0x70) >> 4;
+	    rowcache[pressed_row] &= ~(1 << pressed_col);
+          }
         }
       } else if (c==0xe0) {
         special_key_flag=0x80;
@@ -311,15 +293,15 @@ static void MX_GPIO_Init(void)
   LL_AHB1_GRP1_EnableClock(LL_AHB1_GRP1_PERIPH_GPIOD);
 
   /**/
-  LL_GPIO_SetOutputPin(GPIOE, LL_GPIO_PIN_2|LL_GPIO_PIN_3|LL_GPIO_PIN_4|LL_GPIO_PIN_5 
-                          |LL_GPIO_PIN_6|LL_GPIO_PIN_7|LL_GPIO_PIN_0|LL_GPIO_PIN_1);
+  LL_GPIO_SetOutputPin(GPIOE, LL_GPIO_PIN_0|LL_GPIO_PIN_1|LL_GPIO_PIN_2|LL_GPIO_PIN_3 
+                          |LL_GPIO_PIN_4|LL_GPIO_PIN_5|LL_GPIO_PIN_6|LL_GPIO_PIN_7);
 
   /**/
-  LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_1);
+  LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_1); // LED on my board
 
   /**/
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_2|LL_GPIO_PIN_3|LL_GPIO_PIN_4|LL_GPIO_PIN_5 
-                          |LL_GPIO_PIN_6|LL_GPIO_PIN_7|LL_GPIO_PIN_0|LL_GPIO_PIN_1;
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_0|LL_GPIO_PIN_1|LL_GPIO_PIN_2|LL_GPIO_PIN_3 
+                          |LL_GPIO_PIN_4|LL_GPIO_PIN_5|LL_GPIO_PIN_6|LL_GPIO_PIN_7;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_VERY_HIGH;
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
@@ -327,7 +309,7 @@ static void MX_GPIO_Init(void)
   LL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /**/
-  GPIO_InitStruct.Pin = LL_GPIO_PIN_1;
+  GPIO_InitStruct.Pin = LL_GPIO_PIN_5;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = LL_GPIO_PULL_NO;
   LL_GPIO_Init(GPIOC, &GPIO_InitStruct);
@@ -348,20 +330,49 @@ static void MX_GPIO_Init(void)
   LL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
   /**/
-  LL_SYSCFG_SetEXTISource(LL_SYSCFG_EXTI_PORTC, LL_SYSCFG_EXTI_LINE0);
+  LL_SYSCFG_SetEXTISource(LL_SYSCFG_EXTI_PORTC, LL_SYSCFG_EXTI_LINE4);
 
   /**/
-  EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_0;
+  EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_4;
   EXTI_InitStruct.LineCommand = ENABLE;
   EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
   EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_FALLING;
   LL_EXTI_Init(&EXTI_InitStruct);
 
   /**/
-  LL_GPIO_SetPinPull(GPIOC, LL_GPIO_PIN_0, LL_GPIO_PULL_NO);
+  LL_GPIO_SetPinPull(GPIOC, LL_GPIO_PIN_4, LL_GPIO_PULL_NO);
 
   /**/
-  LL_GPIO_SetPinMode(GPIOC, LL_GPIO_PIN_0, LL_GPIO_MODE_INPUT);
+  LL_GPIO_SetPinMode(GPIOC, LL_GPIO_PIN_4, LL_GPIO_MODE_INPUT);
+
+  /* Init ints on the row pins*/
+  LL_SYSCFG_SetEXTISource(LL_SYSCFG_EXTI_PORTD, LL_SYSCFG_EXTI_LINE0);
+  EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_0;
+  EXTI_InitStruct.LineCommand = ENABLE;
+  EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
+  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_FALLING|LL_EXTI_TRIGGER_RISING;
+  LL_EXTI_Init(&EXTI_InitStruct);
+
+  LL_SYSCFG_SetEXTISource(LL_SYSCFG_EXTI_PORTD, LL_SYSCFG_EXTI_LINE1);
+  EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_1;
+  EXTI_InitStruct.LineCommand = ENABLE;
+  EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
+  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_FALLING|LL_EXTI_TRIGGER_RISING;
+  LL_EXTI_Init(&EXTI_InitStruct);
+
+  LL_SYSCFG_SetEXTISource(LL_SYSCFG_EXTI_PORTD, LL_SYSCFG_EXTI_LINE2);
+  EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_2;
+  EXTI_InitStruct.LineCommand = ENABLE;
+  EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
+  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_FALLING|LL_EXTI_TRIGGER_RISING;
+  LL_EXTI_Init(&EXTI_InitStruct);
+
+  LL_SYSCFG_SetEXTISource(LL_SYSCFG_EXTI_PORTD, LL_SYSCFG_EXTI_LINE3);
+  EXTI_InitStruct.Line_0_31 = LL_EXTI_LINE_3;
+  EXTI_InitStruct.LineCommand = ENABLE;
+  EXTI_InitStruct.Mode = LL_EXTI_MODE_IT;
+  EXTI_InitStruct.Trigger = LL_EXTI_TRIGGER_FALLING|LL_EXTI_TRIGGER_RISING;
+  LL_EXTI_Init(&EXTI_InitStruct);
 
 }
 

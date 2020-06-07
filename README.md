@@ -6,25 +6,24 @@ simple row/column matrix. You connect a PS2 port keyboard to the STM32F407
 board. Pressing a key on the PS2 keyboard ends up registering a keypress on 
 the old computer. I made this for the cases where I have some computer mainboard,
 but not the original keyboard. In this example case, its designed for a 
-Galaksija computer which used a 7 column by 8 row keyboard matrix with the
-Galaksija strobing each column low in sequence and reading the 8 row lines to
-see if a key was pressed. It should be feasible to adapt this for other systems
-that use 8x8 (or larger) key matrixes.
+Omega MSX2 computer. This computer outputs a binary row on 4 pins, and
+then reads back the column on 8 data pins.
 
 How it works
 ------------
 - One part of the program is interrupt driven and is running off the PS2 
-clock line to read keypresses on the keyboard.
+  clock line to read keypresses on the keyboard.
 - The keypress is turned into a row and column reference 
 - some lookup tables determine which row line should be pulled low when
-the relevant column is strobed low.
-- The main loop is continually checking the columns strobes from the old 
-computer. It immediately checks whether it needs to pull a row line 
-low to indicate a key is pressed. The delay between detecting a column strobe
-low and lodging a response on a row can be critical. I made something similar 
-for an Oric Atmos using an Arduino Uno and that was not as fast I had hoped.
-For this STM32F4 based thing (running at 168MHz, so not overclocked), I am seeing
-between 200ns and 350ns response time which is not too bad for this use case.
+  the relevant column is strobed low.
+- The key thing is that we need to closely monitor the 4 bit row
+  output coming from the host computer. When that changes we need to
+  immediately change the column output pins. If we delay much at all
+  here, then its likely the host computer will register a false 
+  keypress. So we do this mainly by generating interrupts on all 4
+  row pins interrupting on both rising and falling edges to pick up
+  all changes.
+
 
 Compiling/Installing
 --------------------
@@ -35,6 +34,10 @@ your PATH, you should be able to just
    make
 ```
 I just used dfu-util to install. Tie BOOT0 high. Plug it in to a USB port and
+do an lsusb. You should see something like
+
+Bus 003 Device 078: ID 0483:df11 STMicroelectronics STM Device in DFU Mode
+
 enter something like
 
 sudo dfu-util -v -d 0483:df11 -a 0 -s 0x08000000 -D build/keyboard-matrix-emulator.bin
@@ -46,74 +49,37 @@ Wiring
 
 Wire the mini DIN PS2 socket to
 ```
-  PC0 - PS2 clock pin
-  PC1 - PS2 data pin
+  PC4 - PS2 clock pin
+  PC5 - PS2 data pin
   +5V - +5V
   GND - GND
 ```
 
 Wire the keyboard like so
 -------------------------
-This is specifically for the Galaksija by Fifan board
-
-I've made some extra notes here as my circuit diagram for the Galaksija by
-Fifan did not match the physical layout of the board
-```
-Columns
--------
-
-XP2       74LS145 pin          STM32F407 pin
-----      -----------          -------------
-
-NC
-p7        p7                   PD6
-p6        p4                   PD3
-p5        p6                   PD5
-p4        p3                   PD2
-p3        p5                   PD4
-p2        p2                   PD1
-p1        p1                   PD0
-
-Rows
-----
-
-XP3       74LS251 pin          STM32F407 pin
-----      -----------          -------------
-p8        p1                   PE3
-p7        p2                   PE2
-p6        p3                   PE1
-p5        p4                   PE0
-p4        p15                  PE4
-p3        p14                  PE5
-p2        p13                  PE6
-p1        p12                  PE7
-```
-And the Galaksija key matrix. It's a little unusual as far as
-key matrix's go, as the keys are in somewhat alphabetic order,
-rather than position order. I think this was due to limited size
-of the original Galaksija ROM.
+This is specifically for the Omega MSX2 computer
 
 ```
+Row
+---
 
-         col0  col1  col2  col3  col4  col5  col6
+ROW_A		PD0
+ROW_B		PD1
+ROW_C		PD2
+ROW_D		PD3
 
-row0      NC    H     P     X     0     8     RET
+Column
+------
 
-row1      A     I     Q     Y     1     9     BRK
+COLUMN_0	PE0	
+COLUMN_1	PE1	
+COLUMN_2	PE2	
+COLUMN_3	PE3	
+COLUMN_4	PE4	
+COLUMN_5	PE5	
+COLUMN_6	PE6	
+COLUMN_7	PE7	
 
-row2      B     J     R     Z     2     ;     RPT
-
-row3      C     K     S     UP    3     :     DEF
-
-row4      D     L     T     DOWN  4     ,     LIST
-
-row5      E     M     U     LEFT  5     =     L.SHFT
-
-row6      F     N     V     RIGHT 6     .     R.SHFT
-
-row7      G     O     W     SPACE 7     /     NC
-
-```
 
 
 
