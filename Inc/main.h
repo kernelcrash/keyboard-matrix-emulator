@@ -50,6 +50,7 @@ typedef uint8_t boolean;
 typedef uint8_t byte;
 #define TRUE 1
 #define FALSE 0
+extern volatile byte rowcache[16];
 
 #define PS2_CLOCK_PIN  LL_GPIO_PIN_0
 #define PS2_DATA_PIN  LL_GPIO_PIN_1

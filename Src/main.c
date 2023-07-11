@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+volatile byte rowcache[16];
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
